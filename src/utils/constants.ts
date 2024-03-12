@@ -13,4 +13,4 @@ export const ROUTES = {
 
 export const API_PATH = '/api';
 
-export const ACCESS_TOKEN_EXPIRES_IN = '30s';
+export const ACCESS_TOKEN_EXPIRES_IN = '24h';
