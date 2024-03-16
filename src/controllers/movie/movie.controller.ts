@@ -7,7 +7,6 @@ import { CustomError } from '../../utils/custom-error';
 import { IMovieDetail, IMovie } from '../../types';
 
 const handleGetMovie: RequestHandler = asyncErrorHandler(
-  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
     const movieId = parseInt(req.params.movieId, 10);
 
@@ -43,11 +42,22 @@ const handleGetMovie: RequestHandler = asyncErrorHandler(
   },
 );
 
+const DEFAULT_PAGE_SIZE = 10;
+
 const handleGetMovies: RequestHandler = asyncErrorHandler(
-  //eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async (_req: Request, res: Response, _next: NextFunction) => {
+  async (req: Request, res: Response) => {
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const pageSize = req.query.pageSize
+      ? Number(req.query.pageSize)
+      : DEFAULT_PAGE_SIZE;
     const movieRepository = dataSource.getRepository(Movie);
-    const movies: IMovie[] = await movieRepository.find();
+
+    const skip = (page - 1) * pageSize;
+
+    const movies: IMovie[] = await movieRepository.find({
+      skip,
+      take: pageSize,
+    });
 
     res.status(200).json({ message: 'Success', data: movies });
   },
