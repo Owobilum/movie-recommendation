@@ -19,7 +19,7 @@ class Review extends BaseEntity {
   @Column()
   comment: string;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 10, scale: 1 })
   rating: number;
 
   @ManyToOne(() => User)
