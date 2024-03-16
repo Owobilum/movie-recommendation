@@ -20,7 +20,7 @@ const handleGetMovie: RequestHandler = asyncErrorHandler(
     if (!movie) return next(new CustomError('Movie does not exist', 404));
 
     const totalRating = movie.reviews.reduce(
-      (sum, review) => (sum += review.rating),
+      (sum, review) => (sum += +review.rating),
       0,
     );
     const averageRating =
@@ -35,7 +35,9 @@ const handleGetMovie: RequestHandler = asyncErrorHandler(
       director: `${movie.director.firstName} ${movie.director.lastName}`,
       sourceMaterial: movie.sourceMaterial,
       studio: movie.studio.name,
-      averageRating,
+      averageRating: averageRating
+        ? parseFloat(averageRating.toFixed(1))
+        : null,
     };
 
     res.status(200).json({ message: 'Success', data: movieObj });
