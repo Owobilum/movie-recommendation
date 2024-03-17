@@ -5,6 +5,8 @@ import { dataSource } from '../../config/data-source';
 import { User } from '../../models/user.model';
 import { CustomError } from '../../utils/custom-error';
 import { IUser } from '../../types';
+import { Movie } from '../../models/movie.model';
+import { Profile } from '../../models/profile.model';
 
 const handleGetProfile = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -44,4 +46,44 @@ const handleGetProfile = asyncErrorHandler(
   },
 );
 
-export { handleGetProfile };
+const handleUpdateWatchlist = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = parseInt(req.params.userId);
+    const { movieId } = req.body;
+
+    if (!movieId) return next(new CustomError('No movie selected', 400));
+
+    const userRepository = dataSource.getRepository(User);
+    const movieRepository = dataSource.getRepository(Movie);
+    const profileRepository = dataSource.getRepository(Profile);
+
+    const user = await userRepository.findOne({
+      where: { id: userId },
+      relations: ['profile', 'profile.watchlist'],
+    });
+
+    if (!user) return next(new CustomError('Cannot find user', 404));
+
+    const profile = await profileRepository.findOne({
+      where: { id: user.profile.id },
+    });
+
+    if (!profile) return next(new CustomError('Cannot find profile', 404));
+
+    const movie = await movieRepository.findOne({
+      where: { id: parseInt(movieId) },
+    });
+
+    if (!movie) return next(new CustomError('Movie does not exist', 404));
+
+    profile.watchlist = [...user.profile.watchlist, movie];
+
+    const savedProfile = await profileRepository.save(profile);
+
+    res
+      .status(200)
+      .json({ message: 'Watchlist updated successfully', data: savedProfile });
+  },
+);
+
+export { handleGetProfile, handleUpdateWatchlist };
