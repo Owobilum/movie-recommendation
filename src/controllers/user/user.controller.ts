@@ -28,6 +28,11 @@ const handleGetProfile = asyncErrorHandler(
 
     if (!user) return next(new CustomError('User not found', 404));
 
+    const authUserId = (req as any).user;
+
+    if (userId && String(authUserId) !== String(userId))
+      return next(new CustomError('You cannot access this resource', 403));
+
     const userObj: IUser = {
       id: user.id,
       username: user.username,
@@ -63,6 +68,11 @@ const handleUpdateWatchlist = asyncErrorHandler(
     });
 
     if (!user) return next(new CustomError('Cannot find user', 404));
+
+    const authUserId = (req as any).user;
+
+    if (userId && String(authUserId) !== String(userId))
+      return next(new CustomError('You cannot access this resource', 403));
 
     const profile = await profileRepository.findOne({
       where: { id: user.profile.id },
