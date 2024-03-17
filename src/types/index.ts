@@ -1,6 +1,10 @@
 import { Genre } from '../models/genre.model';
 import { Actor } from '../models/actor.model';
-export interface IUser {
+import { Movie } from '../models/movie.model';
+import { Director } from '../models/director.model';
+import { Studio } from '../models/studio.model';
+
+export interface IUserRegisterResponse {
   id: number;
   username: string;
   email: string;
@@ -19,4 +23,15 @@ export interface IMovieDetail extends IMovie {
   studio: string;
   director: string;
   averageRating: number | null;
+}
+
+export interface IUser extends IUserRegisterResponse {
+  watchlist: Movie[];
+  viewingHistory: Movie[];
+  preferences: {
+    genres: Genre[];
+    favoriteCasts: Actor[];
+    favoriteDirectors: Director[];
+    favoriteStudios: Studio[];
+  };
 }
