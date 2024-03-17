@@ -7,6 +7,7 @@ import { Actor } from '../models/actor.model';
 import { Genre } from '../models/genre.model';
 import { Review } from '../models/review.model';
 import { Studio } from '../models/studio.model';
+import { Profile } from '../models/profile.model';
 
 const dataSource = new DataSource({
   type: 'postgres',
@@ -17,7 +18,7 @@ const dataSource = new DataSource({
   username: process.env.DATASOURCE_USERNAME,
   password: process.env.DATASOURCE_PASSWORD,
   database: process.env.DATASOURCE_DATABASE,
-  entities: [User, Movie, Director, Actor, Genre, Review, Studio],
+  entities: [User, Movie, Director, Actor, Genre, Review, Studio, Profile],
   synchronize: true,
 });
 
