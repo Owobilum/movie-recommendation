@@ -5,6 +5,8 @@ import { dataSource } from '../../config/data-source';
 import { Movie, MOVIE_RELATIONSHIPS } from '../../models/movie.model';
 import { CustomError } from '../../utils/custom-error';
 import { IMovieDetail, IMovie } from '../../types';
+import { Review } from '../../models/review.model';
+import { User } from '../../models/user.model';
 
 const handleGetMovie: RequestHandler = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -65,4 +67,71 @@ const handleGetMovies: RequestHandler = asyncErrorHandler(
   },
 );
 
-export { handleGetMovie, handleGetMovies };
+const handleGetReviews: RequestHandler = asyncErrorHandler(
+  async (req: Request, res: Response) => {
+    const movieId = parseInt(req.params.movieId);
+
+    const reviews = await dataSource
+      .getRepository(Review)
+      .createQueryBuilder('review')
+      .where('review.movieId = :id', { id: movieId })
+      .select(['review.id', 'review.comment', 'review.rating'])
+      .leftJoin('review.user', 'user')
+      .addSelect('user.id')
+      .leftJoin('review.movie', 'movie')
+      .addSelect('movie.id')
+      .getMany();
+
+    res.status(200).json({ message: 'success', data: reviews });
+  },
+);
+
+const handleCreateReview: RequestHandler = asyncErrorHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const movieId = parseInt(req.params.movieId);
+    const userId = parseInt((req as any).user);
+
+    const movieRepository = dataSource.getRepository(Movie);
+    const reviewRepository = dataSource.getRepository(Review);
+    const userRepository = dataSource.getRepository(User);
+    const { comment, rating } = req.body;
+
+    if (!comment || !rating)
+      return next(new CustomError('comment and rating are required', 400));
+
+    const user = await userRepository.findOne({ where: { id: userId } });
+
+    if (!user)
+      return next(new CustomError('You cannot access this resource', 403));
+
+    const movie = await movieRepository.findOne({
+      where: { id: movieId },
+    });
+
+    if (!movie) return next(new CustomError('Movie does not exist', 404));
+
+    const review = new Review();
+    review.comment = comment;
+    review.rating = rating;
+    review.user = user;
+    review.movie = movie;
+
+    const savedReview = await reviewRepository.save(review);
+
+    res.status(201).json({
+      message: 'review created successfully',
+      data: {
+        id: savedReview.id,
+        rating: savedReview.rating,
+        comment: savedReview.comment,
+      },
+    });
+  },
+);
+
+export {
+  handleGetMovie,
+  handleGetMovies,
+  handleCreateReview,
+  handleGetReviews,
+};
