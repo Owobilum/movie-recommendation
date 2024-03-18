@@ -12,6 +12,7 @@ export enum AUTH_ROUTES {
 export enum MOVIE_ROUTES {
   ALL = '/',
   SINGLE = '/:movieId',
+  REVIEWS = '/:movieId/reviews',
 }
 
 export enum USER_ROUTES {
