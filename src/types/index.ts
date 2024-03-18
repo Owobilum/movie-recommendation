@@ -35,3 +35,11 @@ export interface IUser extends IUserRegisterResponse {
     favoriteStudios: Studio[];
   };
 }
+
+export interface IReview {
+  id: number;
+  userId: number;
+  movieId: number;
+  rating: number;
+  comment: string;
+}

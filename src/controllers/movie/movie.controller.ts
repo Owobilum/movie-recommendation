@@ -4,7 +4,7 @@ import { asyncErrorHandler } from '../../utils/async-error-handler';
 import { dataSource } from '../../config/data-source';
 import { Movie, MOVIE_RELATIONSHIPS } from '../../models/movie.model';
 import { CustomError } from '../../utils/custom-error';
-import { IMovieDetail, IMovie } from '../../types';
+import { IMovieDetail, IMovie, IReview } from '../../types';
 import { Review } from '../../models/review.model';
 import { User } from '../../models/user.model';
 
@@ -118,13 +118,17 @@ const handleCreateReview: RequestHandler = asyncErrorHandler(
 
     const savedReview = await reviewRepository.save(review);
 
+    const reviewObj: IReview = {
+      id: savedReview.id,
+      rating: savedReview.rating,
+      comment: savedReview.comment,
+      userId: user.id,
+      movieId: movie.id,
+    };
+
     res.status(201).json({
       message: 'review created successfully',
-      data: {
-        id: savedReview.id,
-        rating: savedReview.rating,
-        comment: savedReview.comment,
-      },
+      data: reviewObj,
     });
   },
 );
