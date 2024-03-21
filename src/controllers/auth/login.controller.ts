@@ -7,6 +7,7 @@ import { asyncErrorHandler } from '../../utils/async-error-handler';
 import { ACCESS_TOKEN_EXPIRES_IN } from '../../utils/constants';
 import { CustomError } from '../../utils/custom-error';
 import { dataSource } from '../../config/data-source';
+import { IUser } from '../../types';
 
 const handleLogin: RequestHandler = asyncErrorHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -23,16 +24,22 @@ const handleLogin: RequestHandler = asyncErrorHandler(
     if (!isPasswordValid)
       return next(new CustomError('Invalid credentials', 401));
 
-    // create JWT
     const accessToken = jwt.sign(
       { user: foundUser.id },
       process.env.ACCESS_TOKEN_SECRET || '',
       { expiresIn: ACCESS_TOKEN_EXPIRES_IN },
     );
 
-    res
-      .status(200)
-      .json({ message: 'Login successful!', data: { accessToken, foundUser } });
+    const userObj: IUser = {
+      id: foundUser.id,
+      email: foundUser.email,
+      username: foundUser.username,
+    };
+
+    res.status(200).json({
+      message: 'Login successful!',
+      data: { accessToken, user: userObj },
+    });
   },
 );
 
