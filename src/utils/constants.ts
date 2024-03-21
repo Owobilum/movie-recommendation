@@ -21,10 +21,15 @@ export enum USER_ROUTES {
   WATCHLIST = '/:userId/watchlist',
 }
 
+export enum RECOMMENDATIONS_ROUTES {
+  ALL = '/',
+}
+
 export const ROUTES = {
   AUTH: AUTH_ROUTES,
   MOVIE: MOVIE_ROUTES,
   USER: USER_ROUTES,
+  RECOMMENDATIONS: RECOMMENDATIONS_ROUTES,
 } as const;
 
 export const API_PATH = '/api';
