@@ -1,11 +1,11 @@
 import express from 'express';
 
-import { USER_ROUTES } from '../../utils/constants';
+import { USER_ROUTES } from '../utils/constants';
 import {
   handleGetProfile,
   handleUpdateWatchlist,
-} from '../../controllers/user/user.controller';
-import { verifyJWT } from '../../middleware/verify-jwt';
+} from '../controllers/user/user.controller';
+import { verifyJWT } from '../middleware/verify-jwt';
 
 const userRouter = express.Router();
 

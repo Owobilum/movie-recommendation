@@ -1,9 +1,9 @@
 import express from 'express';
 
-import { authRouter } from './auth/auth.route';
+import { authRouter } from './auth.route';
 import { BASE_ROUTES } from '../utils/constants';
-import { movieRouter } from './movie/movie.route';
-import { userRouter } from './user/user.route';
+import { movieRouter } from './movie.route';
+import { userRouter } from './user.route';
 
 const api = express.Router();
 

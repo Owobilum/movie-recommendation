@@ -2,6 +2,7 @@ export enum BASE_ROUTES {
   AUTH = '/auth',
   MOVIES = '/movies',
   USER = '/users',
+  RECOMMENDATIONS = '/recommendations',
 }
 
 export enum AUTH_ROUTES {

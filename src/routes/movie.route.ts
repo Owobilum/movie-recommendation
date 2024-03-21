@@ -5,9 +5,9 @@ import {
   handleGetMovie,
   handleGetMovies,
   handleGetReviews,
-} from '../../controllers/movie/movie.controller';
-import { MOVIE_ROUTES } from '../../utils/constants';
-import { verifyJWT } from '../../middleware/verify-jwt';
+} from '../controllers/movie/movie.controller';
+import { MOVIE_ROUTES } from '../utils/constants';
+import { verifyJWT } from '../middleware/verify-jwt';
 
 const movieRouter = express.Router();
 
