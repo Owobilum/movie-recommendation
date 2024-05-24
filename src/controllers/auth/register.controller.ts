@@ -4,8 +4,10 @@ import { User } from '../../models/user.model';
 import { asyncErrorHandler } from '../../utils/async-error-handler';
 import { CustomError } from '../../utils/custom-error';
 import { hashPassword } from '../../utils/encrypt';
-import type { IUser } from '../../types';
+import type { IUserRegisterResponse } from '../../types';
 import { checkIsInputValid } from '../../utils/helpers';
+import { Profile } from '../../models/profile.model';
+import { dataSource } from '../../config/data-source';
 
 const handleRegisterUser: RequestHandler = asyncErrorHandler(
   async (req, res, next) => {
@@ -25,9 +27,13 @@ const handleRegisterUser: RequestHandler = asyncErrorHandler(
 
     if (!isValid) return;
 
+    const profile = new Profile();
+    const savedProfile = await dataSource.manager.save(profile);
+    user.profile = savedProfile;
+
     const savedUser = await user.save();
 
-    const userObj: IUser = {
+    const userObj: IUserRegisterResponse = {
       email: savedUser.email,
       id: savedUser.id,
       username: savedUser.username,
