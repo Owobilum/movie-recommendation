@@ -5,8 +5,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BaseEntity,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { IsEmail, Length } from 'class-validator';
+
+import { Profile } from './profile.model';
 
 @Entity()
 class User extends BaseEntity {
@@ -30,6 +34,10 @@ class User extends BaseEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToOne(() => Profile)
+  @JoinColumn()
+  profile: Profile;
 }
 
 export { User };
