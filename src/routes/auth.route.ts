@@ -6,7 +6,6 @@ import { UserController } from '../controllers/user.controller';
 import { AuthController } from '../controllers/auth.controller';
 
 const authRouter = express.Router();
-
 const userController = Container.get(UserController);
 const authController = Container.get(AuthController);
 
