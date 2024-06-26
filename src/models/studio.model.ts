@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Movie } from './movie.model';
 
-@Entity()
+@Entity('studio')
 class Studio extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;

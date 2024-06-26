@@ -26,7 +26,7 @@ enum MOVIE_RELATIONSHIPS {
   STUDIO = 'studio',
 }
 
-@Entity()
+@Entity('movie')
 class Movie extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;

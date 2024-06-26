@@ -11,7 +11,7 @@ import {
 import { User } from './user.model';
 import { Movie } from './movie.model';
 
-@Entity()
+@Entity('review')
 class Review extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;

@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Length } from 'class-validator';
 
-@Entity()
+@Entity('professional')
 class Professional extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
