@@ -14,7 +14,7 @@ interface IAuthResponse {
 
 @Service()
 export class AuthService {
-  userRepository: Repository<User>;
+  private userRepository: Repository<User>;
 
   constructor() {
     this.userRepository = dataSource.getRepository(User);

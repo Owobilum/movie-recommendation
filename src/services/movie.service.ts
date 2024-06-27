@@ -11,9 +11,9 @@ import { IMovieDetail, IReview } from '../types';
 
 @Service()
 export class MovieService {
-  movieRepository: Repository<Movie>;
-  reviewRepository: Repository<Review>;
-  userRepository: Repository<User>;
+  private movieRepository: Repository<Movie>;
+  private reviewRepository: Repository<Review>;
+  private userRepository: Repository<User>;
 
   constructor() {
     this.movieRepository = dataSource.getRepository(Movie);

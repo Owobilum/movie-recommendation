@@ -8,8 +8,8 @@ import { Movie } from '../models/movie.model';
 
 @Service()
 export class RecommendationsService {
-  movieRepository: Repository<Movie>;
-  userRepository: Repository<User>;
+  private movieRepository: Repository<Movie>;
+  private userRepository: Repository<User>;
 
   constructor() {
     this.movieRepository = dataSource.getRepository(Movie);

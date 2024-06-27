@@ -12,9 +12,9 @@ import { Movie } from '../models/movie.model';
 
 @Service()
 export class UserService {
-  movieRepository: Repository<Movie>;
-  userRepository: Repository<User>;
-  profileRepository: Repository<Profile>;
+  private movieRepository: Repository<Movie>;
+  private userRepository: Repository<User>;
+  private profileRepository: Repository<Profile>;
 
   constructor() {
     this.movieRepository = dataSource.getRepository(Movie);
