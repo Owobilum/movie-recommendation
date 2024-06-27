@@ -12,7 +12,7 @@ import { IsEmail, Length } from 'class-validator';
 
 import { Profile } from './profile.model';
 
-@Entity()
+@Entity('user')
 class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;

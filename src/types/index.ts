@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 import { Genre } from '../models/genre.model';
 import { Actor } from '../models/actor.model';
 import { Movie } from '../models/movie.model';
@@ -42,4 +44,8 @@ export interface IReview {
   movieId: number;
   rating: number;
   comment: string;
+}
+
+export interface IAuthenticatedRequest extends Request {
+  user?: string;
 }

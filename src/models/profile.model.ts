@@ -14,7 +14,7 @@ import { Actor } from './actor.model';
 import { Director } from './director.model';
 import { Studio } from './studio.model';
 
-@Entity()
+@Entity('profile')
 class Profile extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;

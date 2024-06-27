@@ -1,12 +1,15 @@
 import express from 'express';
+import Container from 'typedi';
 
 import { AUTH_ROUTES } from '../utils/constants';
-import { handleRegisterUser } from '../controllers/auth/register.controller';
-import { handleLogin } from '../controllers/auth/login.controller';
+import { UserController } from '../controllers/user.controller';
+import { AuthController } from '../controllers/auth.controller';
 
 const authRouter = express.Router();
+const userController = Container.get(UserController);
+const authController = Container.get(AuthController);
 
-authRouter.post(AUTH_ROUTES.REGISTER, handleRegisterUser);
-authRouter.post(AUTH_ROUTES.LOGIN, handleLogin);
+authRouter.post(AUTH_ROUTES.REGISTER, userController.register);
+authRouter.post(AUTH_ROUTES.LOGIN, authController.login);
 
 export { authRouter };

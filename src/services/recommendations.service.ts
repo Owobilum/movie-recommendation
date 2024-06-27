@@ -1,18 +1,26 @@
-import { Request, RequestHandler, Response } from 'express';
+import { Service } from 'typedi';
+import { Repository } from 'typeorm';
 
-import { CustomError } from '../../utils/custom-error';
-import { asyncErrorHandler } from '../../utils/async-error-handler';
-import { dataSource } from '../../config/data-source';
-import { User } from '../../models/user.model';
-import { Movie } from '../../models/movie.model';
+import { dataSource } from '../config/data-source';
+import { CustomError } from '../utils/custom-error';
+import { User } from '../models/user.model';
+import { Movie } from '../models/movie.model';
 
-const handleGetRecommendations: RequestHandler = asyncErrorHandler(
-  async (req: Request, res: Response) => {
-    const userId = (req as any).user;
-    if (!userId) return new CustomError('You are not authorised', 401);
+@Service()
+export class RecommendationsService {
+  private movieRepository: Repository<Movie>;
+  private userRepository: Repository<User>;
 
-    const user = await dataSource.getRepository(User).findOne({
-      where: { id: userId },
+  constructor() {
+    this.movieRepository = dataSource.getRepository(Movie);
+    this.userRepository = dataSource.getRepository(User);
+  }
+
+  async getRecommendations(userId?: string): Promise<Movie[]> {
+    if (!userId) throw new CustomError('You are not authorised', 401);
+
+    const user = await this.userRepository.findOne({
+      where: { id: +userId },
       select: ['id'],
       relations: [
         'profile',
@@ -25,11 +33,11 @@ const handleGetRecommendations: RequestHandler = asyncErrorHandler(
       ],
     });
 
-    const allMovies = await dataSource.getRepository(Movie).find({
+    const allMovies = await this.movieRepository.find({
       relations: ['cast', 'director', 'studio', 'genre'],
     });
 
-    if (!user) return new CustomError('You cannot access this resource', 403);
+    if (!user) throw new CustomError('You cannot access this resource', 403);
 
     const favoriteActors = user.profile.favoriteCasts;
     const favoriteDirectors = user.profile.favoriteDirectors;
@@ -84,11 +92,6 @@ const handleGetRecommendations: RequestHandler = asyncErrorHandler(
       }
     });
 
-    res.status(200).json({
-      message: 'success',
-      movies: uniqueMovies,
-    });
-  },
-);
-
-export { handleGetRecommendations };
+    return uniqueMovies;
+  }
+}
