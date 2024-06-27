@@ -1,4 +1,5 @@
 import { Service } from 'typedi';
+import { Repository } from 'typeorm';
 
 import { dataSource } from '../config/data-source';
 import { CustomError } from '../utils/custom-error';
@@ -7,10 +8,18 @@ import { Movie } from '../models/movie.model';
 
 @Service()
 export class RecommendationsService {
+  movieRepository: Repository<Movie>;
+  userRepository: Repository<User>;
+
+  constructor() {
+    this.movieRepository = dataSource.getRepository(Movie);
+    this.userRepository = dataSource.getRepository(User);
+  }
+
   async getRecommendations(userId?: string): Promise<Movie[]> {
     if (!userId) throw new CustomError('You are not authorised', 401);
 
-    const user = await dataSource.getRepository(User).findOne({
+    const user = await this.userRepository.findOne({
       where: { id: +userId },
       select: ['id'],
       relations: [
@@ -24,7 +33,7 @@ export class RecommendationsService {
       ],
     });
 
-    const allMovies = await dataSource.getRepository(Movie).find({
+    const allMovies = await this.movieRepository.find({
       relations: ['cast', 'director', 'studio', 'genre'],
     });
 

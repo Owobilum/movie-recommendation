@@ -1,4 +1,5 @@
 import { Service } from 'typedi';
+import { Repository } from 'typeorm';
 
 import { User } from '../models/user.model';
 import { Profile } from '../models/profile.model';
@@ -11,6 +12,16 @@ import { Movie } from '../models/movie.model';
 
 @Service()
 export class UserService {
+  movieRepository: Repository<Movie>;
+  userRepository: Repository<User>;
+  profileRepository: Repository<Profile>;
+
+  constructor() {
+    this.movieRepository = dataSource.getRepository(Movie);
+    this.userRepository = dataSource.getRepository(User);
+    this.profileRepository = dataSource.getRepository(Profile);
+  }
+
   async registerUser(
     email: string,
     password: string,
@@ -32,15 +43,10 @@ export class UserService {
       throw new CustomError('Invalid user data', 400);
     }
 
-    const profileRepository = dataSource.getRepository(Profile);
-    const userRepository = dataSource.getRepository(User);
-
     const profile = new Profile();
-    const savedProfile = await profileRepository.save(profile);
-
+    const savedProfile = await this.profileRepository.save(profile);
     user.profile = savedProfile;
-
-    const savedUser = await userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
 
     return {
       email: savedUser.email,
@@ -56,7 +62,7 @@ export class UserService {
     if (!authenticatedUserId)
       throw new CustomError('You cannot access this resource', 403);
 
-    const user = await dataSource.getRepository(User).findOne({
+    const user = await this.userRepository.findOne({
       where: { id: userId },
       select: ['id', 'email', 'username'],
       relations: [
@@ -99,11 +105,7 @@ export class UserService {
   ): Promise<Profile> {
     if (!movieId) throw new CustomError('No movie selected', 400);
 
-    const userRepository = dataSource.getRepository(User);
-    const movieRepository = dataSource.getRepository(Movie);
-    const profileRepository = dataSource.getRepository(Profile);
-
-    const user = await userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['profile', 'profile.watchlist'],
     });
@@ -113,13 +115,13 @@ export class UserService {
     if (String(authenticatedUserId) !== String(userId))
       throw new CustomError('You cannot access this resource', 403);
 
-    const profile = await profileRepository.findOne({
+    const profile = await this.profileRepository.findOne({
       where: { id: user.profile.id },
     });
 
     if (!profile) throw new CustomError('Cannot find profile', 404);
 
-    const movie = await movieRepository.findOne({
+    const movie = await this.movieRepository.findOne({
       where: { id: parseInt(movieId) },
     });
 
@@ -127,7 +129,7 @@ export class UserService {
 
     profile.watchlist = [...user.profile.watchlist, movie];
 
-    const savedProfile = await profileRepository.save(profile);
+    const savedProfile = await this.profileRepository.save(profile);
 
     return savedProfile;
   }

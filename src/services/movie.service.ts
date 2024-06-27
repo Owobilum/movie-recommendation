@@ -1,4 +1,5 @@
 import { Service } from 'typedi';
+import { Repository } from 'typeorm';
 
 import { dataSource } from '../config/data-source';
 import { Movie } from '../models/movie.model';
@@ -10,17 +11,24 @@ import { IMovieDetail, IReview } from '../types';
 
 @Service()
 export class MovieService {
-  async getAllMovies(): Promise<Movie[]> {
-    const movieRepository = dataSource.getRepository(Movie);
+  movieRepository: Repository<Movie>;
+  reviewRepository: Repository<Review>;
+  userRepository: Repository<User>;
 
-    const movies: Movie[] = await movieRepository.find();
+  constructor() {
+    this.movieRepository = dataSource.getRepository(Movie);
+    this.reviewRepository = dataSource.getRepository(Review);
+    this.userRepository = dataSource.getRepository(User);
+  }
+
+  async getAllMovies(): Promise<Movie[]> {
+    const movies: Movie[] = await this.movieRepository.find();
 
     return movies;
   }
 
   async getReviews(movieId: number): Promise<Review[]> {
-    const reviews = await dataSource
-      .getRepository(Review)
+    const reviews = await this.reviewRepository
       .createQueryBuilder('review')
       .where('review.movieId = :id', { id: movieId })
       .select(['review.id', 'review.comment', 'review.rating'])
@@ -34,9 +42,7 @@ export class MovieService {
   }
 
   async getMovieDetails(movieId: number): Promise<IMovieDetail> {
-    const movieRepository = dataSource.getRepository(Movie);
-
-    const movie = await movieRepository.findOne({
+    const movie = await this.movieRepository.findOne({
       where: { id: movieId },
       relations: Object.values(MOVIE_RELATIONSHIPS),
     });
@@ -73,10 +79,6 @@ export class MovieService {
     movieId: number,
     userId?: string,
   ): Promise<IReview> {
-    const movieRepository = dataSource.getRepository(Movie);
-    const reviewRepository = dataSource.getRepository(Review);
-    const userRepository = dataSource.getRepository(User);
-
     if (!comment || !rating)
       throw new CustomError('comment and rating are required', 400);
 
@@ -85,11 +87,13 @@ export class MovieService {
 
     const parsedUserId = parseInt(userId);
 
-    const user = await userRepository.findOne({ where: { id: parsedUserId } });
+    const user = await this.userRepository.findOne({
+      where: { id: parsedUserId },
+    });
 
     if (!user) throw new CustomError('You cannot access this resource', 403);
 
-    const movie = await movieRepository.findOne({
+    const movie = await this.movieRepository.findOne({
       where: { id: movieId },
     });
 
@@ -101,7 +105,7 @@ export class MovieService {
     review.user = user;
     review.movie = movie;
 
-    const savedReview = await reviewRepository.save(review);
+    const savedReview = await this.reviewRepository.save(review);
 
     const reviewDto: IReview = {
       id: savedReview.id,
