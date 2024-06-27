@@ -8,8 +8,13 @@ import { MovieService } from '../services/movie.service';
 @Service()
 export class MovieController {
   constructor(@Inject() private readonly movieService: MovieService) {}
-  getAllMovies = asyncErrorHandler(async (_req: Request, res: Response) => {
-    const movies = await this.movieService.getAllMovies();
+  getAllMovies = asyncErrorHandler(async (req: Request, res: Response) => {
+    const pageSize = req.query.pageSize
+      ? Number(req.query.pageSize)
+      : undefined;
+    const page = req.query.page ? Number(req.query.page) : undefined;
+
+    const movies = await this.movieService.getAllMovies(page, pageSize);
 
     res.status(200).json({ success: true, data: movies });
   });

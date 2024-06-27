@@ -8,21 +8,25 @@ import { User } from '../models/user.model';
 import { MOVIE_RELATIONSHIPS } from '../models/movie.model';
 import { CustomError } from '../utils/custom-error';
 import { IMovieDetail, IReview } from '../types';
+import {
+  ExtendRepositoryType,
+  getExtendedRepository,
+} from '../utils/repository';
 
 @Service()
 export class MovieService {
-  private movieRepository: Repository<Movie>;
+  private movieRepository: ExtendRepositoryType<Movie>;
   private reviewRepository: Repository<Review>;
   private userRepository: Repository<User>;
 
   constructor() {
-    this.movieRepository = dataSource.getRepository(Movie);
+    this.movieRepository = getExtendedRepository(Movie);
     this.reviewRepository = dataSource.getRepository(Review);
     this.userRepository = dataSource.getRepository(User);
   }
 
-  async getAllMovies(): Promise<Movie[]> {
-    const movies: Movie[] = await this.movieRepository.find();
+  async getAllMovies(page?: number, pageSize?: number): Promise<Movie[]> {
+    const movies: Movie[] = await this.movieRepository.paginate(page, pageSize);
 
     return movies;
   }
